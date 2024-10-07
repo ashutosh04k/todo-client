@@ -14,7 +14,7 @@ function Todo() {
 
     // Fetch tasks from database
     useEffect(() => {
-        axios.get('http://127.0.0.1:3001/getTodoList')
+        axios.get('http://13.233.160.191:3001/getTodoList')
             .then(result => {
                 setTodoList(result.data)
             })
