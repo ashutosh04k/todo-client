@@ -1,0 +1,35 @@
+name: Deploy todo-client
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Login to docker hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}     
+      - name: Build Docker Image
+        run: docker build -t groothencoder/testing-frontend  .
+
+
+      - name: Publish Image to docker hub
+        run: docker push groothencoder/testing-frontend:latest
+ 
+  deploy:
+    needs: build
+    runs-on: self-hosted 
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull groothencoder/testing-frontend:latest 
+      - name: Delete old container
+        run: 
+          if [ $(docker ps -a -q -f name=testing-frontend-container) ]; then
+            docker rm -f testing-frontend-container;
+          fi
+      - name: Run Docker Container
+        run: docker run -d -p 3000:80(Configured/Default Port:Configured/Default Port) --name testing-frontend-container groothencoder/testing-frontend
